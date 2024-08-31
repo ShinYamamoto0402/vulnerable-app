@@ -12,6 +12,6 @@ Route::controller(UserController::class)->group(function () {
 });
 
 Route::middleware('auth')->controller(SearchController::class)->group(function () {
-    Route::any('searchForm', 'searchForm')->name('searchForm');
-    Route::post('search', 'search')->name('search');
+    Route::any('search', 'search')->name('search');
+    Route::post('results', 'results')->name('results');
 });

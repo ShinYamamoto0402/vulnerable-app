@@ -26,7 +26,7 @@ class UserController extends Controller
      */
     public function loginForm(): View
     {
-        return view('login');
+        return view('auth.login');
     }
 
     /**
@@ -41,7 +41,7 @@ class UserController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            return redirect()->route('searchForm')->with('success', $request->name);
+            return redirect()->route('search')->with('success', $request->name);
         }
 
         return redirect()->back()->withErrors([
@@ -71,7 +71,7 @@ class UserController extends Controller
      */
     public function registerForm(): View
     {
-        return view('register');
+        return view('auth.register');
     }
 
     /**
@@ -89,6 +89,6 @@ class UserController extends Controller
             'savings' => $request->savings,
         ]);
 
-        return redirect()->route('searchForm')->with('success', $request->name);
+        return redirect()->route('search')->with('success', $request->name);
     }
 }

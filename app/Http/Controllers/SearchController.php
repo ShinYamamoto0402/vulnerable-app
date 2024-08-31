@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 use App\Repositories\UserRepositoryInterface;
 
-
 class SearchController extends Controller
 {
     protected $userRepository;
@@ -21,9 +20,9 @@ class SearchController extends Controller
      * 
      * @return View
      */
-    public function searchForm(): View
+    public function search(): View
     {
-        return view('searchForm');
+        return view('search.index');
     }
 
     /**
@@ -32,11 +31,11 @@ class SearchController extends Controller
      * @param Request $request
      * @return View
      */
-    public function search(Request $request): View
+    public function results(Request $request): View
     {
         $name = $request->input('name');
         $users = $this->userRepository->search($name);
 
-        return view('search', ['users' => $users]);
+        return view('search.results', ['users' => $users]);
     }
 }
