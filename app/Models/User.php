@@ -3,11 +3,18 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+use Illuminate\Foundation\Auth\User as AuthenticatableUser;
+use Illuminate\Notifications\Notifiable;
 
-class User extends Model
+class User extends AuthenticatableUser implements AuthenticatableContract
 {
-    use HasFactory;
+    use HasFactory, Notifiable;
 
-    protected $table = "users";
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'savings',
+    ];
 }
