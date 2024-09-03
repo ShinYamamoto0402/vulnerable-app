@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use App\Repositories\UserRepositoryInterface;
@@ -34,8 +35,19 @@ class SearchController extends Controller
     public function results(Request $request): View
     {
         $name = $request->input('name');
-        $users = $this->userRepository->search($name);
+        $results  = $this->userRepository->search($name);
+        $collection = collect($results);
+        $currentPage = $request->input('page', 1);
+        $perPage = config('const.perPage');
 
-        return view('search.results', ['users' => $users]);
+        $paginatedResults = new LengthAwarePaginator(
+            $collection->forPage($currentPage, $perPage),
+            $collection->count(),
+            $perPage,
+            $currentPage,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
+
+        return view('search.results', ['users' => $paginatedResults]);
     }
 }

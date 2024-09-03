@@ -5,13 +5,12 @@
 @section('content')
 <h1>Login</h1>
 <form method="POST" action="{{ route('login') }}">
-    @csrf
     <div class="form-group">
         <label for="email">Email</label>
         @if ($errors->has('email'))
         <div class="form-error-message">{{ $errors->first('email') }}</div>
         @endif
-        <input type="email" id="email" name="email" value="{{ old('email') }}" required>
+        <input required type="email" id="email" name="email" value={!! old('email') !!}>
     </div>
     <div class="form-group">
         <label for="password">Password</label>

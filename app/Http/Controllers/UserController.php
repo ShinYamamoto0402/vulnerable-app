@@ -6,9 +6,15 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Requests\RegisterRequest;
-use App\Http\Requests\LoginRequest;
+use Illuminate\Support\Facades\DB;
 use App\Repositories\UserRepositoryInterface;
+
+/**
+ * パスワードのハッシュ化を削除: register() メソッドでパスワードを平文で保存します。
+ * CSRF対策を無効化: ログアウト時にセッションの無効化やトークンの再生成を削除して、CSRF攻撃のリスクを高めます。
+ * セッションの再生成を削除: ログイン時にセッションの再生成を行わないようにし、セッションフィクセーション攻撃のリスクを生じさせます。
+ * XSSのリスク: メッセージに対して適切なエスケープ処理を行わないようにします。
+ */
 
 class UserController extends Controller
 {
@@ -32,15 +38,17 @@ class UserController extends Controller
     /**
      * ログイン処理
      * 
-     * @param LoginRequest $request
+     * @param Request $request
      * @return RedirectResponse
      */
-    public function login(LoginRequest $request): RedirectResponse
+    public function login(Request $request): RedirectResponse
     {
         $credentials = $request->only('email', 'password');
 
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
+        $user = DB::select("SELECT * FROM users WHERE email = '{$credentials['email']}'");
+
+        if ($user && $credentials['password'] == $user[0]->password) {
+            $request->session()->put('userId', $user[0]->id);
             return redirect()->route('search')->with('success', $request->name);
         }
 
@@ -49,17 +57,16 @@ class UserController extends Controller
         ]);
     }
 
+
     /**
      * ログアウト処理
      * 
      * @param Request $request
      * @return RedirectResponse
      */
-    public function logout(Request $request): RedirectResponse
+    public function logout(): RedirectResponse
     {
         Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
 
         return redirect()->route('loginForm');
     }
@@ -77,15 +84,15 @@ class UserController extends Controller
     /**
      * ユーザー登録
      * 
-     * @param RegisterRequest $request
+     * @param Request $request
      * @return RedirectResponse
      */
-    public function register(RegisterRequest $request): RedirectResponse
+    public function register(Request $request): RedirectResponse
     {
         $this->userRepository->create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => bcrypt($request->password),
+            'password' => $request->password,
             'savings' => $request->savings,
         ]);
 

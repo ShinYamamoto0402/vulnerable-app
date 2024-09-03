@@ -3,10 +3,12 @@
 namespace App\Repositories;
 
 use App\Models\User;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Exception;
+
+/**
+ * SQLインジェクション: search() メソッドの name パラメータを直接クエリに渡すことで、SQLインジェクションのリスクを生じさせます。
+ * トランザクション管理の不備: 例外処理を外し、トランザクションの管理を不適切にしてエラーハンドリングの欠如を発生させます。
+ */
 
 class UserRepository implements UserRepositoryInterface
 {
@@ -25,26 +27,17 @@ class UserRepository implements UserRepositoryInterface
      */
     public function create(array $attributes): void
     {
-        DB::beginTransaction();
-
-        try {
-            $this->model->create($attributes);
-            DB::commit();
-        } catch (Exception $e) {
-            DB::rollBack();
-            Log::error('User creation failed: ' . $e->getMessage());
-            throw $e;
-        }
+        $this->model->create($attributes);
     }
 
     /**
      * 検索結果
      * 
-     * @param string $attributes
-     * @return Collection
+     * @param ?string $name
+     * @return array
      */
-    public function search(string $name): Collection
+    public function search(?string $name): array
     {
-        return $this->model->where('name', 'like', '%' . $name . '%')->get();
+        return DB::select("SELECT * FROM users WHERE name LIKE '%$name%'");
     }
 }

@@ -5,20 +5,19 @@
 @section('content')
 <h1>Register</h1>
 <form action="{{ route('register') }}" method="POST">
-    @csrf
     <div class="form-group">
         <label for="name">Name</label>
         @if ($errors->has('name'))
         <div class="form-error-message">{{ $errors->first('name') }}</div>
         @endif
-        <input type="text" id="name" name="name" value="{{ old('name') }}" required>
+        <input required type="text" id="name" name="name" value={!! old('name') !!}>
     </div>
     <div class="form-group">
         <label for="email">Email</label>
         @if ($errors->has('email'))
         <div class="form-error-message">{{ $errors->first('email') }}</div>
         @endif
-        <input type="email" id="email" name="email" value="{{ old('email') }}" required>
+        <input required type="email" id="email" name="email" value={!! old('email') !!}>
     </div>
     <div class="form-group">
         <label for="password">Password</label>
@@ -39,7 +38,7 @@
         @if ($errors->has('savings'))
         <div class="form-error-message">{{ $errors->first('savings') }}</div>
         @endif
-        <input type="number" id="savings" name="savings" value="{{ old('savings') }}" required>
+        <input type="number" id="savings" name="savings" value={!! old('savings') !!} required>
     </div>
     <div class="btn-group">
         <button type="button" onclick="window.location.href='{{ route('loginForm') }}'" class="btn-rtn">Back</button>
